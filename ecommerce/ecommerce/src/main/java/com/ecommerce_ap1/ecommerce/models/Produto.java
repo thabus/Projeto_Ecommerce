@@ -1,20 +1,24 @@
 package com.ecommerce_ap1.ecommerce.models;
 
-import jakarta.persistence.*;
+import com.azure.spring.data.cosmos.core.mapping.Container;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+
+import java.util.UUID;
 
 @Data
-@Entity(name = "produtos")
+@Container(containerName = "produtos")
 public class Produto {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @Column
+    private String id;
+
     private String nome;
-    @Column
     private String descricao;
-    @Column
     private Double preco;
-    @Column
     private Integer estoque;
+
+    public Produto() {
+        this.id = UUID.randomUUID().toString();
+    }
 }

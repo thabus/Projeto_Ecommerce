@@ -24,7 +24,7 @@ public class Pedido {
         inverseJoinColumns = @JoinColumn(name = "produto_id")
     )
     @Column
-    private List<Produto> produtos;
+    private List<ProdutoJPA> produtos;
 
     @Column
     private Double valorTotal;
