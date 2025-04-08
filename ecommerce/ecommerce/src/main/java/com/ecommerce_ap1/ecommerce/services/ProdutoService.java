@@ -1,7 +1,7 @@
 package com.ecommerce_ap1.ecommerce.services;
 
 import com.ecommerce_ap1.ecommerce.models.Produto;
-import com.ecommerce_ap1.ecommerce.repositories.cosmos.ProdutoRepository;
+import com.ecommerce_ap1.ecommerce.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class ProdutoService {
         return produtoRepository.findAll();
     }
 
-    public Produto atualizarProduto(String id, Produto produtoAtualizado) {
+    public Produto atualizarProduto(Integer id, Produto produtoAtualizado) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
@@ -32,7 +32,7 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
-    public void removerProduto(String id) {
+    public void removerProduto(Integer id) {
         if (!produtoRepository.existsById(id)) {
             throw new RuntimeException("Produto não encontrado");
         }
