@@ -35,10 +35,11 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
-    public void removerProduto(String id) {
+    public void removerProduto(String id, String produtoCategoria) {
         if (!produtoRepository.existsById(id)) {
             throw new RuntimeException("Produto não encontrado");
         }
-        produtoRepository.deleteById(id);
+        produtoRepository.deleteByIdAndProdutoCategoria(id, produtoCategoria);
     }
+
 }
