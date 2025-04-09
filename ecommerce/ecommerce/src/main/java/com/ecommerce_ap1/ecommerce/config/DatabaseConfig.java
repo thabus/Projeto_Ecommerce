@@ -12,9 +12,9 @@ public class DatabaseConfig {
     public DataSource getDataSource() {
         return DataSourceBuilder.create()
                 .driverClassName("com.mysql.cj.jdbc.Driver")
-                .url("jdbc:mysql://localhost:3306/ecommerce")
-                .username("root")
-                .password("mysqlroot")
+                .url("jdbc:mysql://ibmec-cloud-ecommerce386296.mysql.database.azure.com/ecommerce")
+                .username("arvore")
+                .password("M1nhaarvore")
                 .build();
     }
 }
