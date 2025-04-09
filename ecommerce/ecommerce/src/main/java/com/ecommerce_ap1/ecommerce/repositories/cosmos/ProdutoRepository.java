@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProdutoRepository extends CosmosRepository<Produto, String> {
+
+    void deleteByIdAndProdutoCategoria(String id, String produtoCategoria);
+
 }

@@ -33,9 +33,13 @@ public class ProdutoController {
         return ResponseEntity.ok(atualizado);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
-        produtoService.removerProduto(id);
-        return ResponseEntity.noContent().build();
-    }
+    @DeleteMapping("/{id}/{categoria}")
+    public ResponseEntity<String> deletar(
+            @PathVariable String id,
+            @PathVariable("categoria") String categoria) {
+        produtoService.removerProduto(id, categoria);
+        return ResponseEntity.ok("Produto com ID " + id + " e categoria '" + categoria + "' foi deletado com sucesso.");
+}
+
+
 }
