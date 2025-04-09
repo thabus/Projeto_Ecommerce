@@ -6,8 +6,8 @@ import com.ecommerce_ap1.ecommerce.models.Produto;
 import com.ecommerce_ap1.ecommerce.models.Usuario;
 import com.ecommerce_ap1.ecommerce.repositories.CartaoCreditoRepository;
 import com.ecommerce_ap1.ecommerce.repositories.PedidoRepository;
-import com.ecommerce_ap1.ecommerce.repositories.ProdutoRepository;
 import com.ecommerce_ap1.ecommerce.repositories.UsuarioRepository;
+import com.ecommerce_ap1.ecommerce.repositories.cosmos.ProdutoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,23 +26,24 @@ public class PedidoService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private ProdutoRepository produtoRepository;
+    private CartaoCreditoRepository cartaoRepository;
 
     @Autowired
-    private CartaoCreditoRepository cartaoRepository;
+    private ProdutoRepository produtoRepository;
 
     public Pedido realizarPedido(Pedido pedido) {
         Integer usuarioId = pedido.getUsuario().getId();
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        // Carrega os produtos do pedido
+        // Lista de IDs dos produtos enviados
+        List<String> produtoIds = pedido.getProdutoIds();
         List<Produto> produtos = new ArrayList<>();
         double total = 0.0;
 
-        for (Produto p : pedido.getProdutos()) {
-            Produto produto = produtoRepository.findById(p.getId())
-                    .orElseThrow(() -> new RuntimeException("Produto com ID " + p.getId() + " não encontrado"));
+        for (String id : produtoIds) {
+            Produto produto = produtoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Produto com ID " + id + " não encontrado"));
             produtos.add(produto);
             total += produto.getPreco();
         }
@@ -64,9 +65,10 @@ public class PedidoService {
 
         // Preenche dados do pedido
         pedido.setUsuario(usuario);
-        pedido.setProdutos(produtos);
+        pedido.setProdutoIds(produtoIds);
         pedido.setValorTotal(total);
         pedido.setDataHora(LocalDateTime.now());
+        pedido.setCartao(cartaoUsado);
 
         Pedido salvo = pedidoRepository.save(pedido);
 
@@ -76,5 +78,4 @@ public class PedidoService {
     public List<Pedido> listarPedidos() {
         return pedidoRepository.findAll();
     }
-
 }

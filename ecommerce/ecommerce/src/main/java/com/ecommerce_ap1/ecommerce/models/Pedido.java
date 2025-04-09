@@ -17,14 +17,10 @@ public class Pedido {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    @ManyToMany
-    @JoinTable(
-        name = "pedido_produto",
-        joinColumns = @JoinColumn(name = "pedido_id"),
-        inverseJoinColumns = @JoinColumn(name = "produto_id")
-    )
-    @Column
-    private List<Produto> produtos;
+    @ElementCollection
+    @CollectionTable(name = "pedido_produto_ids", joinColumns = @JoinColumn(name = "pedido_id"))
+    @Column(name = "produto_id")
+    private List<String> produtoIds; // Armazena apenas os IDs dos produtos
 
     @Column
     private Double valorTotal;
