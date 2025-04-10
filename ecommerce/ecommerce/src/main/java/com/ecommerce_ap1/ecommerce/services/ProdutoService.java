@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class ProdutoService {
 
-    @Autowired
+    @Autowired(required = false)
     private ProdutoRepository produtoRepository;
 
     public Produto criarProduto(Produto produto) {
