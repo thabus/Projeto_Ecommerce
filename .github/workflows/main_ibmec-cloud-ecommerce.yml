@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: 'microsoft'
 
       - name: Build with Maven
         run: mvn clean install -f ./ecommerce/ecommerce/pom.xml -DskipTests
