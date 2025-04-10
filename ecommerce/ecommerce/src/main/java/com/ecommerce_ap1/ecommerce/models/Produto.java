@@ -5,7 +5,6 @@ import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-
 @Data
 @Container(containerName = "produtos")
 public class Produto {
