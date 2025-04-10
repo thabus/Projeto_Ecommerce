@@ -21,8 +21,8 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'microsoft'
+          java-version: '11'
+          distribution: 'zulu'
 
       - name: Build with Maven
         run: mvn clean install -f ./ecommerce/ecommerce/pom.xml -DskipTests
