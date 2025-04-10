@@ -14,7 +14,7 @@ public class Produto {
     private String id;
 
     @PartitionKey
-    private String produtoCategoria;
+    private String categoria;
 
     private String nome;
     private String descricao;

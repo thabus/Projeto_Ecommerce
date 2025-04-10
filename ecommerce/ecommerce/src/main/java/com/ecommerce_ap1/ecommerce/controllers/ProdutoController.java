@@ -3,43 +3,46 @@ package com.ecommerce_ap1.ecommerce.controllers;
 import com.ecommerce_ap1.ecommerce.models.Produto;
 import com.ecommerce_ap1.ecommerce.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/produto")
+@RequestMapping("/produtos")
 public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
 
+    // Criar novo produto
     @PostMapping
-    public ResponseEntity<Produto> criar(@RequestBody Produto produto) {
-        Produto novo = produtoService.criarProduto(produto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novo);
+    public Produto criarProduto(@RequestBody Produto produto) {
+        return produtoService.criarProduto(produto);
     }
 
+    // Listar todos os produtos
     @GetMapping
-    public ResponseEntity<List<Produto>> listarTodos() {
-        return ResponseEntity.ok(produtoService.listarProdutos());
+    public List<Produto> listarProdutos() {
+        return produtoService.listarProdutos();
     }
 
+    // Atualizar produto (PATCH ou PUT parcial)
     @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizar(@PathVariable String id, @RequestBody Produto produtoAtualizado) {
-        Produto atualizado = produtoService.atualizarProduto(id, produtoAtualizado);
-        return ResponseEntity.ok(atualizado);
+    public Produto atualizarProduto(
+            @PathVariable String id,
+            @RequestBody Produto produtoAtualizado
+    ) {
+        return produtoService.atualizarProduto(id, produtoAtualizado);
     }
 
+    // Deletar produto (requer ID e categoria por ser PartitionKey)
     @DeleteMapping("/{id}/{categoria}")
     public ResponseEntity<String> deletar(
-            @PathVariable String id,
-            @PathVariable("categoria") String categoria) {
-        produtoService.removerProduto(id, categoria);
-        return ResponseEntity.ok("Produto com ID " + id + " e categoria '" + categoria + "' foi deletado com sucesso.");
+        @PathVariable String id,
+        @PathVariable("categoria") String categoria) {
+    produtoService.removerProduto(id, categoria);
+    return ResponseEntity.ok("Produto com ID " + id + " e categoria '" + categoria + "' foi deletado com sucesso.");
 }
-
 
 }

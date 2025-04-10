@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class ProdutoService {
 
-    @Autowired(required = false)
+    @Autowired
     private ProdutoRepository produtoRepository;
 
     public Produto criarProduto(Produto produto) {
@@ -28,18 +28,37 @@ public class ProdutoService {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        produto.setNome(produtoAtualizado.getNome());
-        produto.setDescricao(produtoAtualizado.getDescricao());
-        produto.setPreco(produtoAtualizado.getPreco());
+        if (produtoAtualizado.getNome() != null) {
+            produto.setNome(produtoAtualizado.getNome());
+        }
+        if (produtoAtualizado.getDescricao() != null) {
+            produto.setDescricao(produtoAtualizado.getDescricao());
+        }
+        if (produtoAtualizado.getPreco() != null) {
+            produto.setPreco(produtoAtualizado.getPreco());
+        }
+        if (produtoAtualizado.getEstoque() != null) {
+            produto.setEstoque(produtoAtualizado.getEstoque());
+        }
+        if (produtoAtualizado.getCategoria() != null) {
+            produto.setCategoria(produtoAtualizado.getCategoria());
+        }
 
         return produtoRepository.save(produto);
     }
 
-    public void removerProduto(String id, String produtoCategoria) {
-        if (!produtoRepository.existsById(id)) {
-            throw new RuntimeException("Produto não encontrado");
+
+    public void removerProduto(String id, String categoria) {
+        Produto produto = produtoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        if (!produto.getCategoria().equals(categoria)) {
+            throw new RuntimeException("Categoria não corresponde à do produto.");
         }
-        produtoRepository.deleteByIdAndProdutoCategoria(id, produtoCategoria);
+
+        // Este método é seguro e funciona porque a partition key já está no objeto
+        produtoRepository.delete(produto);
     }
+
 
 }

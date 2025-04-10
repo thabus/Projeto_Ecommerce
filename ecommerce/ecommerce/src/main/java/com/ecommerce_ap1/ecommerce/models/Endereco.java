@@ -1,5 +1,7 @@
 package com.ecommerce_ap1.ecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,5 +25,7 @@ public class Endereco {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonBackReference
     private Usuario usuario;
+
 }

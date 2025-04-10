@@ -1,12 +1,13 @@
 package com.ecommerce_ap1.ecommerce.services;
 
+import com.ecommerce_ap1.ecommerce.models.CartaoCredito;
+import com.ecommerce_ap1.ecommerce.repositories.CartaoCreditoRepository;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce_ap1.ecommerce.models.CartaoCredito;
-import com.ecommerce_ap1.ecommerce.repositories.CartaoCreditoRepository;
 
 @Service
 public class CartaoCreditoService {
@@ -14,23 +15,35 @@ public class CartaoCreditoService {
     @Autowired
     private CartaoCreditoRepository cartaoRepository;
 
-    public CartaoCredito salvar(CartaoCredito cartao) {
-        return cartaoRepository.save(cartao);
+    public void realizarCompra(Integer idCartao, double valorCompra) {
+        CartaoCredito cartao = cartaoRepository.findById(idCartao)
+            .orElseThrow(() -> new IllegalArgumentException("Cartão não encontrado"));
+
+        if (cartao.getSaldoDisponivel() < valorCompra) {
+            throw new IllegalArgumentException("Saldo insuficiente para a compra.");
+        }
+
+        cartao.setSaldoDisponivel(cartao.getSaldoDisponivel() - valorCompra);
+        cartaoRepository.save(cartao);
+    }
+
+    public java.util.Optional<CartaoCredito> buscarCartaoPorId(Integer id) {
+        return cartaoRepository.findById(id);
     }
 
 
-    public CartaoCredito buscarPorId(Integer id) {
-        return cartaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
+
+    public List<CartaoCredito> listarTodos() {
+        return cartaoRepository.findAll();
     }
 
-    public CartaoCredito atualizarSaldo(Integer cartaoId, double novoSaldo) {
-        CartaoCredito cartao = buscarPorId(cartaoId);
+    public CartaoCredito atualizarSaldo(Integer idCartao, double novoSaldo) {
+        CartaoCredito cartao = cartaoRepository.findById(idCartao)
+            .orElseThrow(() -> new IllegalArgumentException("Cartão não encontrado"));
+
         cartao.setSaldoDisponivel(novoSaldo);
         return cartaoRepository.save(cartao);
     }
 
-    public List<CartaoCredito> listarPorUsuario(Integer usuarioId) {
-        return cartaoRepository.findByUsuarioId(usuarioId);
-    }
+
 }
