@@ -8,10 +8,9 @@ import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.DirectConnectionConfig;
 import com.azure.spring.data.cosmos.config.AbstractCosmosConfiguration;
 import com.azure.spring.data.cosmos.config.CosmosConfig;
-import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
+
 
 @Configuration
-@EnableCosmosRepositories(basePackages = "com.ecommerce_ap1.ecommerce.repositories.cosmos")
 @PropertySource("classpath:application.properties")
 public class CosmosConfiguracao extends AbstractCosmosConfiguration {
 
