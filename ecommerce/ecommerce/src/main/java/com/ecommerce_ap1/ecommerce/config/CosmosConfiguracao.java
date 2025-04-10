@@ -1,6 +1,5 @@
 package com.ecommerce_ap1.ecommerce.config;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -12,7 +11,6 @@ import com.azure.spring.data.cosmos.config.CosmosConfig;
 import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
 
 @Configuration
-@EnableConfigurationProperties(CosmosPropriedades.class)
 @EnableCosmosRepositories(basePackages = "com.ecommerce_ap1.ecommerce.repositories.cosmos")
 @PropertySource("classpath:application.properties")
 public class CosmosConfiguracao extends AbstractCosmosConfiguration {
