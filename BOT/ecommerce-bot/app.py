@@ -34,12 +34,6 @@ CONVERSATION_STATE = ConversationState(MEMORY)
 USER_STATE = UserState(MEMORY)
 
 
-# Create MemoryStorage, UserState and ConversationState
-MEMORY = MemoryStorage()
-CONVERSATION_STATE = ConversationState(MEMORY)
-USER_STATE = UserState(MEMORY)
-
-
 # create main dialog and bot
 DIALOG = MainDialogo(USER_STATE)
 BOT = BotDialogo(CONVERSATION_STATE, USER_STATE, DIALOG)
