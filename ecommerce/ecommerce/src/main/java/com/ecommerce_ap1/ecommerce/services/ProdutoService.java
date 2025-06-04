@@ -60,5 +60,10 @@ public class ProdutoService {
         produtoRepository.delete(produto);
     }
 
+    public List<Produto> buscarPorNome(String nome) {
+        // Implemente a busca no repositório, ex: produtoRepository.findByNomeContainingIgnoreCase(nome)
+        return produtoRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
 
 }

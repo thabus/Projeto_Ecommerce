@@ -1,6 +1,7 @@
 package com.ecommerce_ap1.ecommerce.controllers;
 
 import com.ecommerce_ap1.ecommerce.models.CartaoCredito;
+import com.ecommerce_ap1.ecommerce.models.Transacao;
 import com.ecommerce_ap1.ecommerce.services.CartaoCreditoService;
 
 import java.util.List;
@@ -51,4 +52,9 @@ public class CartaoCreditoController {
         }
     }
 
+    @GetMapping("/{id}/extrato")
+    public ResponseEntity<List<Transacao>> extrato(@PathVariable Integer id) {
+        List<Transacao> extrato = cartaoService.obterExtrato(id);
+        return ResponseEntity.ok(extrato);
+    }
 }

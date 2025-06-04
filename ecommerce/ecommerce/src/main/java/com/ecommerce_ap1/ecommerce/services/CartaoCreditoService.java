@@ -1,6 +1,7 @@
 package com.ecommerce_ap1.ecommerce.services;
 
 import com.ecommerce_ap1.ecommerce.models.CartaoCredito;
+import com.ecommerce_ap1.ecommerce.models.Transacao;
 import com.ecommerce_ap1.ecommerce.repositories.CartaoCreditoRepository;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public class CartaoCreditoService {
 
     @Autowired
     private CartaoCreditoRepository cartaoRepository;
+
+    @Autowired
+    private TransacaoService transacaoService;
 
     public void realizarCompra(Integer idCartao, double valorCompra) {
         CartaoCredito cartao = cartaoRepository.findById(idCartao)
@@ -31,7 +35,10 @@ public class CartaoCreditoService {
         return cartaoRepository.findById(id);
     }
 
-
+    public List<Transacao> obterExtrato(Integer cartaoId) {
+        // Busca o extrato das transações pelo id do cartão
+        return transacaoService.obterExtrato(cartaoId.toString());
+    }
 
     public List<CartaoCredito> listarTodos() {
         return cartaoRepository.findAll();
