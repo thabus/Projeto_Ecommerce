@@ -20,6 +20,12 @@ class VerificarPedidoDialog(ComponentDialog):
         )
 
         self.initial_dialog_id = "verificarPedidoWaterfallDialog"
+        
+        
+    async def prompt_option_step(self, step_context: WaterfallStepContext):
+        prompt = MessageFactory.text("Informe o nome do produto do pedido que deseja consultar.")
+        return await step_context.prompt("nomePrompt", PromptOptions(prompt=prompt))
+
 
     async def prompt_process_product_name_step(self, step_context: WaterfallStepContext):
         nomeProduto = step_context.result
