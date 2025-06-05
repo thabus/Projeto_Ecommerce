@@ -23,7 +23,7 @@ from botbuilder.schema import (
 )
 from botbuilder.dialogs.choices import Choice
 from botbuilder.core import MessageFactory, UserState
-# from api.product_api import ProductAPI
+from produto_api import ProductAPI
 from dialogos.verificar_pedidos import VerificarPedidoDialog
 from dialogos.verificar_produtos import VerificarProdutoDialog
 from dialogos.lista_compra import Listacompra
@@ -89,7 +89,6 @@ class Inicio(ComponentDialog):
         
         return await step_context.end_dialog()
     
-        """
         
        
     async def show_card_produto(self ,turn_context):
@@ -117,5 +116,5 @@ class Inicio(ComponentDialog):
         )
         await turn_context.send_activity(MessageFactory.attachment(card))
 
-        """
+        
         

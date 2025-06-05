@@ -50,4 +50,9 @@ public class ProdutoController {
             return produtoService.buscarPorNome(nome);
         }
 
+   @GetMapping("/search")
+    public List<Produto> findByProductName(@RequestParam("productName") String nomeProduto) {   
+        return produtoService.findByProductNameContains(nomeProduto);
+    }
+
 }
