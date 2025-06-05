@@ -6,7 +6,7 @@ from botbuilder.dialogs import (
     WaterfallStepContext,
     DialogTurnResult,
 )
-from botbuilder.dialogos.prompts import (
+from botbuilder.dialogs.prompts import (
     TextPrompt,
     NumberPrompt,
     ChoicePrompt,
@@ -21,17 +21,17 @@ from botbuilder.schema import (
     CardAction,
     CardImage,
 )
-from botbuilder.dialogos.choices import Choice
+from botbuilder.dialogs.choices import Choice
 from botbuilder.core import MessageFactory, UserState
-from api.product_api import ProductAPI
+# from api.product_api import ProductAPI
 from dialogos.verificar_pedidos import VerificarPedidoDialog
 from dialogos.verificar_produtos import VerificarProdutoDialog
 from dialogos.lista_compra import Listacompra
 
 
-class inicio(ComponentDialog):
+class Inicio(ComponentDialog):
     def __init__(self, user_state: UserState):
-        super(inicio, self).__init__("inicio")
+        super(Inicio, self).__init__("inicio")
 
         self.user_state = user_state
 
@@ -89,6 +89,9 @@ class inicio(ComponentDialog):
         
         return await step_context.end_dialog()
     
+        """
+        
+       
     async def show_card_produto(self ,turn_context):
         
         produto_api = ProductAPI()
@@ -113,3 +116,6 @@ class inicio(ComponentDialog):
             )
         )
         await turn_context.send_activity(MessageFactory.attachment(card))
+
+        """
+        

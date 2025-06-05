@@ -18,9 +18,9 @@ from botbuilder.core import (
 from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
 
-from bot import MyBot
 from config import DefaultConfig
-
+from dialogos.inicio import Inicio
+from bots.bot_dialogo import BotDialogo
 
 
 CONFIG = DefaultConfig()
@@ -35,7 +35,7 @@ USER_STATE = UserState(MEMORY)
 
 
 # create main dialog and bot
-DIALOG = MainDialogo(USER_STATE)
+DIALOG = Inicio(USER_STATE)
 BOT = BotDialogo(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 
