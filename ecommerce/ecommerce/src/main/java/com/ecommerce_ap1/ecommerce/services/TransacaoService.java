@@ -1,29 +1,31 @@
 package com.ecommerce_ap1.ecommerce.services;
 
 import com.ecommerce_ap1.ecommerce.models.Transacao;
+import com.ecommerce_ap1.ecommerce.repositories.TransacaoRepository; 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TransacaoService {
 
-    // Simulação de banco de dados em memória
-    private List<Transacao> transacoes = new ArrayList<>();
+    @Autowired
+    private TransacaoRepository transacaoRepository;
 
     public List<Transacao> obterExtrato(String cartaoId) {
-        // Filtra as transações pelo id do cartão
-        List<Transacao> extrato = new ArrayList<>();
-        for (Transacao t : transacoes) {
-            if (t.getCartaoId().equals(cartaoId)) {
-                extrato.add(t);
-            }
-        }
-        return extrato;
+        return transacaoRepository.findByCartaoId(cartaoId);
     }
 
     public void registrarTransacao(Transacao transacao) {
-        transacoes.add(transacao);
+        if (transacao.getId() == null || transacao.getId().isEmpty()) {
+            transacao.setId(UUID.randomUUID().toString());
+        }
+        if (transacao.getDataTransacao() == null) {
+            transacao.setDataTransacao(new Date());
+        }
+        transacaoRepository.save(transacao);
     }
 }

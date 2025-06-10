@@ -2,6 +2,7 @@ package com.ecommerce_ap1.ecommerce.controllers;
 
 import java.util.List;
 
+import com.ecommerce_ap1.ecommerce.request.RealizarCompraRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,15 @@ public class PedidoController {
     private PedidoService pedidoService;
 
     @PostMapping("/comprar")
-    public ResponseEntity<Pedido> realizarCompra(@RequestBody Pedido pedido) {
-        Pedido pedidoRealizado = pedidoService.realizarCompra(pedido);
-        return ResponseEntity.ok(pedidoRealizado);
+    public ResponseEntity<?> realizarCompra(@RequestBody RealizarCompraRequest request) {
+        try {
+            Pedido pedidoRealizado = pedidoService.realizarCompra(request);
+            return ResponseEntity.ok(pedidoRealizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().body("Erro interno do servidor: " + e.getMessage());
+        }
     }
 
     @GetMapping

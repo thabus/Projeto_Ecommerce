@@ -22,7 +22,6 @@ public class CartaoCreditoController {
         return cartaoService.listarTodos();
     }
 
-
     @PutMapping("/{id}/saldo")
     public CartaoCredito atualizarSaldo(
         @PathVariable Integer id,
@@ -36,8 +35,7 @@ public class CartaoCreditoController {
         return cartaoService.buscarCartaoPorId(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
-}
-
+    }
 
     @PostMapping("/{id}/compra")
     public ResponseEntity<String> realizarCompra(
@@ -45,7 +43,8 @@ public class CartaoCreditoController {
         @RequestParam double valor
     ) {
         try {
-            cartaoService.realizarCompra(id, valor);
+            String descricaoPadrao = "Compra direta via Cartão de Crédito";
+            cartaoService.realizarCompra(id, valor, descricaoPadrao);
             return ResponseEntity.ok("Compra realizada com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional; // Importar Optional para findById
 
 @Service
 public class ProdutoService {
@@ -24,9 +25,25 @@ public class ProdutoService {
         return produtos;
     }
 
+    public Optional<Produto> buscarProdutoPorId(String id) {
+        return produtoRepository.findById(id);
+    }
+
+    public Produto decrementarEstoque(String id, int quantidade) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado para decrementar estoque: " + id));
+
+        if (produto.getEstoque() < quantidade) {
+            throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produto.getNome());
+        }
+
+        produto.setEstoque(produto.getEstoque() - quantidade);
+        return produtoRepository.save(produto);
+    }
+
     public Produto atualizarProduto(String id, Produto produtoAtualizado) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado para atualização"));
 
         if (produtoAtualizado.getNome() != null) {
             produto.setNome(produtoAtualizado.getNome());
@@ -47,26 +64,18 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
-
     public void removerProduto(String id, String categoria) {
         Produto produto = produtoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado para remoção: " + id));
 
-        if (!produto.getCategoria().equals(categoria)) {
-            throw new RuntimeException("Categoria não corresponde à do produto.");
-        }
-
-        // Este método é seguro e funciona porque a partition key já está no objeto
         produtoRepository.delete(produto);
     }
 
     public List<Produto> buscarPorNome(String nome) {
-        // Implemente a busca no repositório, ex: produtoRepository.findByNomeContainingIgnoreCase(nome)
         return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 
     public List<Produto> findByNomeContains(String nome) {
         return produtoRepository.findByNomeContains(nome);
     }
-
 }
