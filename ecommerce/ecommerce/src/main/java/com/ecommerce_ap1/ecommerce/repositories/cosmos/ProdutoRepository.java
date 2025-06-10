@@ -14,7 +14,7 @@ public interface ProdutoRepository extends CosmosRepository<Produto, String> {
 
     List<Produto> findByNomeContainingIgnoreCase(String nome);
 
-    List<Produto> findByProductNameStartingWith(String nomeProduto);
-    List<Produto> findByProductNameContains(String nomeProduto);
+    List<Produto> findByNomeContains(String nome);
+    List<Produto> findByNomeStartingWith(String nome);
 
 }

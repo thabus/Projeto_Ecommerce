@@ -51,8 +51,8 @@ public class ProdutoController {
         }
 
    @GetMapping("/search")
-    public List<Produto> findByProductName(@RequestParam("productName") String nomeProduto) {   
-        return produtoService.findByProductNameContains(nomeProduto);
+    public List<Produto> findByNome(@RequestParam("nome") String nome) {
+        return produtoService.findByNomeContains(nome);
     }
 
 }

@@ -65,8 +65,8 @@ public class ProdutoService {
         return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 
-    public List<Produto> findByProductNameContains(String nomeProduto) {
-        return produtoRepository.findByProductNameContains(nomeProduto);
+    public List<Produto> findByNomeContains(String nome) {
+        return produtoRepository.findByNomeContains(nome);
     }
 
 }

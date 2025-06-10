@@ -2,13 +2,12 @@ package com.ecommerce_ap1.ecommerce.models;
 
 import java.util.Date;
 
-import com.azure.spring.data.cosmos.core.mapping.Container;
-
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
-@Container(containerName = "pedidos")
+@Entity(name = "transacoes")
 public class Transacao {
 
     @Id
