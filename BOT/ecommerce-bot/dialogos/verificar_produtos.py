@@ -2,6 +2,8 @@ from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepCo
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
 
+# Importa a ProductAPI do arquivo produto_api.py
+from api.rotas import ProductAPI
 
 class VerificarProdutoDialog(ComponentDialog):
     def __init__(self):
@@ -19,11 +21,10 @@ class VerificarProdutoDialog(ComponentDialog):
             )
         )
 
-
         self.initial_dialog_id = "verificarProdutoWaterfallDialog"
+        self.product_api = ProductAPI()
 
-    async def product_name_step(self, step_context: WaterfallStepContext) :
-
+    async def product_name_step(self, step_context: WaterfallStepContext):
         msgPrompt = MessageFactory.text("Informe o nome do produto que você deseja verificar.")
 
         opcoesPrompt = PromptOptions(
@@ -33,26 +34,23 @@ class VerificarProdutoDialog(ComponentDialog):
 
         return await step_context.prompt(TextPrompt.__name__, opcoesPrompt)
 
-    async def prompt_process_product_name_step(self, step_context: WaterfallStepContext) :
+    async def prompt_process_product_name_step(self, step_context: WaterfallStepContext):
         nomeProduto = step_context.result
 
-        # Substituir pela API)
-        produtos = [
-            {"produto": "Camisa", "preco": "R$ 50,00", "estoque": 10},
-            {"produto": "Calça", "preco": "R$ 80,00", "estoque": 5},
-        ]
-        resultado = next((p for p in produtos if p["produto"].lower() == nomeProduto.lower()), None)
+        produtos_encontrados = self.product_api.verificar_produtos(nomeProduto)
 
-        if resultado:
+        if produtos_encontrados:
+            primeiro_produto = produtos_encontrados[0]
+
             resposta = (
-                f"Produto: {resultado['produto']}\n"
-                f"Preço: {resultado['preco']}\n"
-                f"Estoque disponível: {resultado['estoque']}"
+                f"**Nome:** {primeiro_produto.get('nome', 'N/A')}\n"
+                f"**Categoria:** {primeiro_produto.get('categoria', 'N/A')}\n"
+                f"**Descrição:** {primeiro_produto.get('descricao', 'N/A')}\n"
+                f"**Preço:** R$ {primeiro_produto.get('preco', 0.0):.2f}\n"
+                f"**Estoque:** {primeiro_produto.get('estoque', 0)}"
             )
         else:
             resposta = f"Não encontramos o produto '{nomeProduto}'."
 
         await step_context.context.send_activity(MessageFactory.text(resposta))
         return await step_context.end_dialog()
-
-
