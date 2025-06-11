@@ -1,15 +1,16 @@
 from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions, NumberPrompt, ChoicePrompt, ConfirmPrompt
-from botbuilder.schema import ActivityTypes, TextFormatTypes
 from botbuilder.dialogs.choices import Choice
 
+# Importa as APIs necessárias do seu arquivo rotas.py
 from api.rotas import ProductAPI, PedidoAPI, UsuarioAPI
 
 class ComprarProdutoDialog(ComponentDialog):
     def __init__(self):
         super(ComprarProdutoDialog, self).__init__("ComprarProdutoDialog")
 
+        # Nomes dos prompts
         self.PROMPT_USER_ID = "userIdPrompt"
         self.PROMPT_CHOICE_ORDER_TYPE = "choiceOrderTypePrompt"
         self.PROMPT_PENDING_ORDER_ID = "pendingOrderIdPrompt"
@@ -18,6 +19,7 @@ class ComprarProdutoDialog(ComponentDialog):
         self.PROMPT_CARD_ID = "cardIdPrompt"
         self.PROMPT_CONFIRM_PAYMENT = "confirmPaymentPrompt"
 
+        # Adiciona os prompts
         self.add_dialog(TextPrompt(self.PROMPT_USER_ID))
         self.add_dialog(ChoicePrompt(self.PROMPT_CHOICE_ORDER_TYPE))
         self.add_dialog(TextPrompt(self.PROMPT_PENDING_ORDER_ID))
@@ -27,6 +29,7 @@ class ComprarProdutoDialog(ComponentDialog):
         self.add_dialog(ConfirmPrompt(self.PROMPT_CONFIRM_PAYMENT))
 
 
+        # Define os passos do diálogo em cascata (Waterfall)
         self.add_dialog(
             WaterfallDialog(
                 "comprarProdutoWaterfallDialog",
@@ -37,7 +40,7 @@ class ComprarProdutoDialog(ComponentDialog):
                     self.process_new_or_pending_order_flow_step,
                     self.ask_card_id_or_confirm_new_order_payment_step,
                     self.create_and_process_payment_step,
-                    self.final_step
+                    self.final_step # Garante que final_step é o último
                 ],
             )
         )
@@ -50,14 +53,12 @@ class ComprarProdutoDialog(ComponentDialog):
         self.produtos_para_novo_pedido_ids = []
 
     async def ask_user_id_step(self, step_context: WaterfallStepContext):
-        # Pede o id do usuario
         return await step_context.prompt(
             self.PROMPT_USER_ID,
             PromptOptions(prompt=MessageFactory.text("Por favor, informe seu identificador de usuário (ID):"))
         )
 
     async def verify_user_and_ask_order_type_step(self, step_context: WaterfallStepContext):
-        # Verifica o usuário e pergunta se deseja criar novo pedido ou pagar um pendente
         user_id = step_context.result
         step_context.values["user_id"] = user_id
 
@@ -80,14 +81,12 @@ class ComprarProdutoDialog(ComponentDialog):
             return await step_context.end_dialog()
 
     async def handle_order_type_choice_step(self, step_context: WaterfallStepContext):
-        #Direciona o fluxo baseado na escolha do usuário (Criar novo ou Pagar pendente)
         choice = step_context.result.value
         step_context.values["order_type_choice"] = choice
 
         if choice == "Pagar pedido pendente":
-            return await step_context.next(None) # Pula para o próximo passo para listar pedidos pendentes
+            return await step_context.next(None)
         elif choice == "Criar novo pedido":
-            # Limpa a lista de produtos temporária para um novo pedido
             self.produtos_para_novo_pedido_ids = []
             return await step_context.prompt(
                 self.PROMPT_PRODUCT_NAME,
@@ -98,18 +97,16 @@ class ComprarProdutoDialog(ComponentDialog):
             return await step_context.replace_dialog(self.initial_dialog_id)
 
     async def process_new_or_pending_order_flow_step(self, step_context: WaterfallStepContext):
-        # Gerencia o fluxo de criação de novo pedido ou listagem de pendente.
         user_id = step_context.values.get("user_id")
         order_type_choice = step_context.values.get("order_type_choice")
 
         if order_type_choice == "Pagar pedido pendente":
-            pedidos_pendentes = await self.pedido_api.listar_pedidos_por_usuario_e_status(user_id, "pendente")
+            pedidos_pendentes = self.pedido_api.listar_pedidos_por_usuario_e_status(user_id, "pendente")
             step_context.values["pedidos_pendentes_usuario"] = pedidos_pendentes
 
             if pedidos_pendentes:
                 response_message = f"Seus pedidos pendentes, {step_context.values['user_name']}:\n\n"
                 for pedido in pedidos_pendentes:
-                    # 'produtos' agora é a lista de nomes no seu modelo de Pedido
                     produtos_nomes = pedido.get('produtos', [])
                     response_message += (
                         f"**ID do Pedido:** {pedido.get('id', 'N/A')}\n"
@@ -120,9 +117,7 @@ class ComprarProdutoDialog(ComponentDialog):
                     )
                 response_message = response_message.rstrip("----------\n")
 
-                activity = MessageFactory.text(response_message)
-                activity.text_format = TextFormat.Markdown
-                await step_context.context.send_activity(activity)
+                await step_context.context.send_activity(MessageFactory.text(response_message))
 
                 return await step_context.prompt(
                     self.PROMPT_PENDING_ORDER_ID,
@@ -133,22 +128,18 @@ class ComprarProdutoDialog(ComponentDialog):
                 return await step_context.end_dialog()
 
         elif order_type_choice == "Criar novo pedido":
-            # resultado do PROMPT_PRODUCT_NAME OU loop de adicionar mais produtos
-            product_name = step_context.result
+            product_name_input = step_context.result
 
-            # Se o usuário digitou "SAIR"
-            if isinstance(product_name, str) and product_name.upper() == "SAIR":
-                await step_context.context.send_activity("Operação cancelada. Voltando ao menu principal.")
-                return await step_context.end_dialog()
+            if isinstance(product_name_input, str) and product_name_input.upper() == "SAIR":
+                return await step_context.next(False) # Avanca para o proximo passo, indicando que não quer mais produtos.
 
-            produtos_encontrados = self.product_api.verificar_produtos(product_name)
+            produtos_encontrados = self.product_api.verificar_produtos(product_name_input)
 
             if produtos_encontrados:
                 produto = produtos_encontrados[0]
                 if produto.get('estoque', 0) > 0:
                     self.produtos_para_novo_pedido_ids.append(produto.get('id'))
 
-                    # Pergunta se quer acrescentar mais produtos
                     return await step_context.prompt(
                         self.PROMPT_ADD_MORE_PRODUCTS,
                         PromptOptions(
@@ -157,25 +148,20 @@ class ComprarProdutoDialog(ComponentDialog):
                         )
                     )
                 else:
-                    await step_context.context.send_activity(f"Desculpe, o produto '{product_name}' está fora de estoque no momento.")
+                    await step_context.context.send_activity(f"Desculpe, o produto '{product_name_input}' está fora de estoque no momento.")
                     return await step_context.end_dialog()
             else:
-                await step_context.context.send_activity(f"Produto '{product_name}' não encontrado. Por favor, digite o nome novamente ou 'SAIR'.")
-                # Loop para tentar novamente ou sair
-                return await step_context.replace_dialog(self.initial_dialog_id, step_context.values) # Volta ao início do diálogo de compra
+                await step_context.context.send_activity(f"Produto '{product_name_input}' não encontrado. Por favor, digite o nome novamente ou 'SAIR'.")
+                return await step_context.replace_dialog(self.initial_dialog_id, step_context.values)
 
-        return await step_context.end_dialog() # Em caso de fluxo inesperado
+        return await step_context.end_dialog()
 
 
     async def ask_card_id_or_confirm_new_order_payment_step(self, step_context: WaterfallStepContext):
-        """
-        Passo 5: Para pedido pendente: valida ID e pede cartão. Para novo pedido: lida com loop de "adicionar mais" ou pergunta se quer pagar.
-        """
         user_id = step_context.values.get("user_id")
         order_type_choice = step_context.values.get("order_type_choice")
 
         if order_type_choice == "Pagar pedido pendente":
-            # Resultado do PROMPT_PENDING_ORDER_ID
             pedido_id_to_pay = step_context.result
 
             if isinstance(pedido_id_to_pay, str) and pedido_id_to_pay.upper() == "SAIR":
@@ -197,22 +183,22 @@ class ComprarProdutoDialog(ComponentDialog):
                 return await step_context.end_dialog()
 
         elif order_type_choice == "Criar novo pedido":
-            add_more_products = step_context.result # Resultado do PROMPT_ADD_MORE_PRODUCTS (bool)
+            add_more_products_result = step_context.result
 
-            if add_more_products:
-                # Loop para adicionar mais produtos
+            if isinstance(add_more_products_result, bool) and add_more_products_result:
                 return await step_context.prompt(
                     self.PROMPT_PRODUCT_NAME,
                     PromptOptions(prompt=MessageFactory.text("Ok! Qual o nome do próximo produto que você quer adicionar? (Digite 'SAIR' para finalizar a adição)"))
                 )
-            else: # Usuário não quer mais produtos, então criamos o pedido
-                produtos_ids_compra = self.produtos_para_novo_pedido_ids # Pega a lista acumulada
+            else: # Usuário não quer mais produtos (False) ou 'SAIR' veio do prompt do produto
+                produtos_ids_compra = self.produtos_para_novo_pedido_ids
 
                 if not produtos_ids_compra:
                     await step_context.context.send_activity("Nenhum produto foi adicionado ao seu pedido. Compra cancelada.")
                     return await step_context.end_dialog()
 
                 await step_context.context.send_activity("Finalizando a adição de produtos. Criando seu pedido...")
+                user_id = step_context.values.get("user_id")
                 pedido_criado = self.pedido_api.criar_pedido(user_id, produtos_ids_compra)
 
                 if pedido_criado:
@@ -220,7 +206,6 @@ class ComprarProdutoDialog(ComponentDialog):
                     await step_context.context.send_activity(
                         f"Seu pedido '{pedido_criado.get('id')}' foi criado com status 'pendente'."
                     )
-                    # Pergunta se o usuário quer pagar agora
                     return await step_context.prompt(
                         self.PROMPT_CONFIRM_PAYMENT,
                         PromptOptions(
@@ -241,58 +226,64 @@ class ComprarProdutoDialog(ComponentDialog):
         """
         order_type_choice = step_context.values.get("order_type_choice")
 
+        cartao_id_raw = step_context.result
+
+        if isinstance(cartao_id_raw, str) and cartao_id_raw.upper() == "SAIR":
+            await step_context.context.send_activity("Operação de pagamento cancelada. Voltando ao menu principal.")
+            return await step_context.end_dialog()
+
         cartao_id = None
         pedido_id_para_pagar = None
 
         if order_type_choice == "Pagar pedido pendente":
-            cartao_id = int(step_context.result) # Resultado do PROMPT_CARD_ID
+            try:
+                cartao_id = int(cartao_id_raw)
+            except ValueError:
+                await step_context.context.send_activity("ID do cartão inválido. Por favor, digite um número ou 'SAIR'.")
+                return await step_context.end_dialog()
             pedido_id_para_pagar = step_context.values.get("pedido_a_pagar_id")
         elif order_type_choice == "Criar novo pedido":
-            confirm_payment_now = step_context.result # Resultado do PROMPT_CONFIRM_PAYMENT (bool)
+            confirm_payment_now = step_context.result
 
-            if not confirm_payment_now:
+            if isinstance(confirm_payment_now, bool) and not confirm_payment_now:
                 await step_context.context.send_activity("Seu pedido foi adicionado aos pendentes. Você pode pagá-lo mais tarde.")
-                return await step_context.end_dialog() # Termina o diálogo
+                return await step_context.end_dialog()
 
-            # Se o usuário confirmou pagamento, precisamos pedir o ID do cartão AGORA
-            # Este é um loop: Se o usuário confirmou pagamento, mas o ID do cartão ainda não foi pedido,
-            # voltamos ao prompt do cartão e o próximo passo será este mesmo passo com o ID do cartão.
-            if step_context.result is True and not step_context.values.get("card_id_asked"):
-                step_context.values["card_id_asked"] = True # Marca que já pedimos
+            if isinstance(confirm_payment_now, bool) and confirm_payment_now and not step_context.values.get("card_id_asked_for_new_order"):
+                step_context.values["card_id_asked_for_new_order"] = True
                 return await step_context.prompt(
                     self.PROMPT_CARD_ID,
                     PromptOptions(prompt=MessageFactory.text("Por favor, digite o ID do seu cartão de crédito para o pagamento."))
                 )
 
-            # Se chegamos aqui, é porque o usuário já forneceu o ID do cartão
-            cartao_id = int(step_context.result) # Resultado do PROMPT_CARD_ID da segunda vez
+            try:
+                cartao_id = int(cartao_id_raw)
+            except ValueError:
+                await step_context.context.send_activity("ID do cartão inválido. Por favor, digite um número ou 'SAIR'.")
+                return await step_context.end_dialog()
+
             pedido_id_para_pagar = step_context.values.get("pedido_criado_id")
 
-        # Se por algum motivo o cartao_id não foi obtido (ex: usuário digitou algo não numérico)
         if cartao_id is None or cartao_id <= 0:
-            await step_context.context.send_activity("ID do cartão inválido. Tente novamente ou digite 'SAIR'.")
+            await step_context.context.send_activity("ID do cartão inválido ou não fornecido. Tente novamente ou digite 'SAIR'.")
             return await step_context.end_dialog()
-
-        # Validação de existência do cartão (opcional, pode ser feito pela API de usuário/cartão)
-        # Por enquanto, confiamos que a API de pagamento lidará com cartões inexistentes.
 
         await step_context.context.send_activity("Processando o pagamento...")
 
         pedido_pago = self.pedido_api.processar_pagamento_pedido(pedido_id_para_pagar, cartao_id)
 
         if pedido_pago and pedido_pago.get('status') == 'pago':
-            # Detalhes para a mensagem de sucesso
+            produtos_comprados_nomes = []
             if order_type_choice == "Pagar pedido pendente":
                 pedido_details = step_context.values.get("pedido_a_pagar_details", {})
-                produtos_comprados_nomes = pedido_details.get("produtos", []) # Pega nomes do pedido existente
+                produtos_comprados_nomes = pedido_details.get("produtos", [])
             else: # Novo pedido
-                # Pega a lista de IDs de produtos do novo pedido e pode precisar buscar nomes
-                # Uma forma simples de mostrar os nomes se não foram armazenados:
-                produtos_comprados_nomes = []
-                for prod_id in self.produtos_para_novo_pedido_ids:
-                    produto_info = self.product_api.verificar_produtos_por_id(prod_id) # API ProductAPI precisa de um método por ID
-                    if produto_info:
-                        produtos_comprados_nomes.append(produto_info[0].get("nome", "Produto Desconhecido"))
+                # Buscamos o pedido recém-criado completo para obter os nomes dos produtos
+                pedido_recem_criado_completo = self.pedido_api.buscar_pedido_por_id(pedido_id_para_pagar)
+                if pedido_recem_criado_completo:
+                    produtos_comprados_nomes = pedido_recem_criado_completo.get("produtos", [])
+                else:
+                    produtos_comprados_nomes = ["produto(s)"] # Fallback
 
             response_message = (
                 f"Pagamento do pedido '{pedido_id_para_pagar}' para "
@@ -307,7 +298,7 @@ class ComprarProdutoDialog(ComponentDialog):
                 "Por favor, verifique os detalhes do seu cartão ou tente novamente mais tarde."
             )
 
-        return await step_context.next(None)
+        return await step_context.next(None) # Garante que o fluxo continua para o final_step
 
     async def final_step(self, step_context: WaterfallStepContext):
         """
@@ -315,4 +306,9 @@ class ComprarProdutoDialog(ComponentDialog):
         """
         # Limpa a lista de produtos temporária para o próximo novo pedido
         self.produtos_para_novo_pedido_ids = []
+        # Remove a flag do cartão de crédito para um novo fluxo
+        if "card_id_asked_for_new_order" in step_context.values:
+            del step_context.values["card_id_asked_for_new_order"]
+        # Mensagem final ou volta ao menu principal
+        await step_context.context.send_activity("Operação finalizada. Espero ter ajudado!")
         return await step_context.end_dialog()
