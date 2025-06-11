@@ -5,8 +5,8 @@ class ProductAPI:
     def verificar_produtos(self, nomeProduto):
         try:
             response = requests.get(
-                "http://localhost:8080/produtos/search",
-                params={"productName": nomeProduto},
+                "http://localhost:80/produtos/search",
+                params={"nome": nomeProduto},
                 timeout=5
             )
             response.raise_for_status()
@@ -20,7 +20,7 @@ class PedidoAPI:
     def verificar_pedidos_por_produto(self, nomeProduto):
         try:
             response = requests.get(
-                "http://localhost:8080/pedidos/search",
+                "http://localhost:80/pedidos/search",
                 params={"nome": nomeProduto},
                 timeout=5
             )
@@ -37,7 +37,7 @@ class PedidoAPI:
                 "produtosIds": produto_ids
             }
             response = requests.post(
-                "http://localhost:8080/pedidos/criar",
+                "http://localhost:80/pedidos/criar",
                 json=payload,
                 timeout=5
             )
@@ -54,7 +54,7 @@ class PedidoAPI:
                 "cartaoId": cartao_id
             }
             response = requests.post(
-                f"http://localhost:8080/pedidos/processarPagamento/{pedido_id}",
+                f"http://localhost:80/pedidos/processarPagamento/{pedido_id}",
                 json=payload,
                 timeout=5
             )
@@ -69,7 +69,7 @@ class PedidoPagoAPI:
     def verificar_lista_compras(self):
         try:
             response = requests.get(
-                "http://localhost:8080/pedidos",
+                "http://localhost:80/pedidos",
                 params={"status": "pago"},
                 timeout=5
             )
