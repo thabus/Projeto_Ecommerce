@@ -36,20 +36,24 @@ class VerificarProdutoDialog(ComponentDialog):
     async def prompt_process_product_name_step(self, step_context: WaterfallStepContext):
         nomeProduto = step_context.result
 
-        produtos_encontrados = self.product_api.verificar_produtos(nomeProduto) # <--- Linha alterada!
+        produtos_encontrados = self.product_api.verificar_produtos(nomeProduto)
 
         if produtos_encontrados:
-            primeiro_produto = produtos_encontrados[0]
+            resposta_detalhada = f"Encontrei os seguintes produtos que contêm '{nomeProduto}':\n\n"
 
-            resposta = (
-                f"**Nome:** {primeiro_produto.get('nome', 'N/A')}\n\n"
-                f"**Categoria:** {primeiro_produto.get('categoria', 'N/A')}\n\n"
-                f"**Descrição:** {primeiro_produto.get('descricao', 'N/A')}\n\n"
-                f"**Preço:** R$ {primeiro_produto.get('preco', 0.0):.2f}\n\n"
-                f"**Estoque:** {primeiro_produto.get('estoque', 0)}"
-            )
+            for produto in produtos_encontrados:
+                resposta_detalhada += (
+                    f"**Nome:** {produto.get('nome', 'N/A')}\n\n"
+                    f"**Categoria:** {produto.get('categoria', 'N/A')}\n\n"
+                    f"**Descrição:** {produto.get('descricao', 'N/A')}\n\n"
+                    f"**Preço:** R$ {produto.get('preco', 0.0):.2f}\n\n"
+                    f"**Estoque:** {produto.get('estoque', 0)}\n\n"
+                    f"----------\n"
+                )
+
+            resposta = resposta_detalhada.rstrip("----------\n")
         else:
-            resposta = f"Não encontramos o produto '{nomeProduto}'."
+            resposta = f"Não encontramos nenhum produto que contenha '{nomeProduto}'."
 
         await step_context.context.send_activity(MessageFactory.text(resposta))
         return await step_context.end_dialog()

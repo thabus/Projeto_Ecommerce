@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional; // Importar Optional para findById
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
@@ -66,7 +66,7 @@ public class ProdutoService {
 
     public void removerProduto(String id, String categoria) {
         Produto produto = produtoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Produto não encontrado para remoção: " + id));
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado para remoção: " + id));
 
         produtoRepository.delete(produto);
     }
@@ -76,6 +76,6 @@ public class ProdutoService {
     }
 
     public List<Produto> findByNomeContains(String nome) {
-        return produtoRepository.findByNomeContains(nome);
+        return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 }

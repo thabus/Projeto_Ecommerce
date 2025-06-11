@@ -32,7 +32,7 @@ class PedidoAPI:
     def criar_pedido(self, usuario_id: str, produtos_ids: list[str]):
         try:
             payload = {
-                "usuarioId": usuario_id, # Enviando como string, o backend fará a conversão para Integer
+                "usuarioId": usuario_id,
                 "produtosIds": produtos_ids
             }
             response = requests.post(
@@ -64,12 +64,11 @@ class PedidoAPI:
 
     def listar_pedidos_por_usuario_e_status(self, usuario_id: str, status: str = None):
         try:
-            # URL ajustada para porta 80
             params = {"usuarioId": usuario_id}
             if status:
                 params["status"] = status
             response = requests.get(
-                "http://localhost:80/pedidos", # Assumindo que este endpoint aceita usuarioId e status
+                "http://localhost:80/pedidos",
                 params=params,
                 timeout=5
             )
@@ -105,13 +104,17 @@ class UsuarioAPI:
             print(f"Erro ao buscar usuário por ID '{usuario_id}': {e}")
             return None
 
-
 class PedidoPagoAPI:
-    def verificar_lista_compras(self):
+    def verificar_lista_compras(self, usuario_id: str):
         try:
+            params = {
+                "status": "pago",
+                "usuarioId": usuario_id
+            }
+
             response = requests.get(
                 "http://localhost:80/pedidos",
-                params={"status": "pago"},
+                params=params,
                 timeout=5
             )
             response.raise_for_status()

@@ -40,15 +40,15 @@ class VerificarPedidoDialog(ComponentDialog):
                 status = pedido.get('status', 'N/A')
                 valor_total = pedido.get('valorTotal', 0.0)
                 data_pedido = pedido.get('dataPedido', 'N/A')
-                cliente_id = pedido.get('clienteId', 'N/A')
+                usuario_nome = pedido.get('usuarioNome', 'N/A')
 
                 resposta += (
-                    f"**ID do Pedido:** {pedido_id}\n"
-                    f"**Cliente ID:** {cliente_id}\n"
-                    f"**Valor Total:** R$ {valor_total:.2f}\n"
-                    f"**Data do Pedido:** {data_pedido}\n"
-                    f"**Status:** {status}\n"
-                    f"----------\n"
+                    f"**ID do Pedido:** {pedido_id}\n\n"
+                    f"**Usuario:** {usuario_nome}\n\n"
+                    f"**Valor Total:** R$ {valor_total:.2f}\n\n"
+                    f"**Data do Pedido:** {data_pedido}\n\n"
+                    f"**Status:** {status}\n\n"
+                    f"----------\n\n"
                 )
 
             if pedidos_encontrados:
