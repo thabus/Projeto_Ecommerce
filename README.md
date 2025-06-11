@@ -1,10 +1,10 @@
-# Projeto E-commerce: API com Persistência Poliglota na Azure ☁️
+# Projeto E-commerce - API de Dados na Nuvem ☁️
 
 Este repositório contém o código-fonte de uma API REST para uma plataforma de e-commerce, construída com Java, Spring Boot e uma arquitetura de dados moderna utilizando múltiplos serviços de banco de dados na nuvem da Microsoft Azure.
 
 ## 🏛️ Arquitetura da Solução
 
-O projeto implementa um padrão de **Persistência Poliglota**, selecionando a tecnologia de banco de dados mais adequada para cada tipo de dado, otimizando performance, escalabilidade e consistência.
+O projeto implementa um banco de dados mais adequado para cada tipo de dado, otimizando performance, escalabilidade e consistência.
 
 A API centraliza a lógica de negócio, orquestrando as operações entre dois serviços de banco de dados na Azure:
 
