@@ -23,7 +23,7 @@ from botbuilder.schema import (
 )
 from botbuilder.dialogs.choices import Choice
 from botbuilder.core import MessageFactory, UserState
-from api.rotas import RotasAPI
+from api.rotas import ProdutosAPI
 from dialogos.verificar_pedidos import VerificarPedidoDialog
 from dialogos.verificar_produtos import VerificarProdutoDialog
 from dialogos.lista_compra import ListaCompra
@@ -98,7 +98,7 @@ class Inicio(ComponentDialog):
 '''
     async def show_card_produto(self ,turn_context):
 
-        rotas_api = RotasAPI()
+        rotas_api = ProdutosAPI()
 
         response = rotas_api.consultar_api()
         print(response)

@@ -1,9 +1,9 @@
 from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
-from botbuilder.core import MessageFactory, ActivityTypes
+from botbuilder.core import MessageFactory
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
-from botbuilder.schema import TextFormat
+from botbuilder.schema import TextFormatTypes, ActivityTypes
 
-from api.rotas import ProductAPI
+from api.rotas import ProdutosAPI
 
 class VerificarProdutoDialog(ComponentDialog):
     def __init__(self):
@@ -22,7 +22,7 @@ class VerificarProdutoDialog(ComponentDialog):
         )
 
         self.initial_dialog_id = "verificarProdutoWaterfallDialog"
-        self.product_api = ProductAPI()
+        self.product_api = ProdutosAPI()
 
     async def product_name_step(self, step_context: WaterfallStepContext):
         msgPrompt = MessageFactory.text("Informe o nome do produto que você deseja consultar")

@@ -1,7 +1,7 @@
 from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions, NumberPrompt, ChoicePrompt, ConfirmPrompt
-from botbuilder.schema import ActivityTypes, TextFormat
+from botbuilder.schema import ActivityTypes, TextFormatTypes
 from botbuilder.dialogs.choices import Choice
 
 from api.rotas import ProductAPI, PedidoAPI, UsuarioAPI
