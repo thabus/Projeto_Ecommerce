@@ -5,7 +5,7 @@ import java.util.List;
 
 @Data
 public class RealizarCompraRequest {
-    private String clienteId;
+    private String usuarioId;
     private List<String> produtosIds;
-    private Integer cartaoId; 
+    private Integer cartaoId;
 }

@@ -14,8 +14,10 @@ public class Pedido {
     @Id
     private String id;
 
-    private String clienteId;
+    private String usuarioId;
+    private String usuarioNome;
     private List<String> produtosIds;
+    private List<String> produtos;
     private Double valorTotal;
     private Date dataPedido;
     private String status;

@@ -1,8 +1,8 @@
 from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
-from botbuilder.core import MessageFactory
+from botbuilder.core import MessageFactory, ActivityTypes
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
+from botbuilder.schema import TextFormat
 
-# Importa a ProductAPI do arquivo produto_api.py
 from api.rotas import ProductAPI
 
 class VerificarProdutoDialog(ComponentDialog):
@@ -25,7 +25,7 @@ class VerificarProdutoDialog(ComponentDialog):
         self.product_api = ProductAPI()
 
     async def product_name_step(self, step_context: WaterfallStepContext):
-        msgPrompt = MessageFactory.text("Informe o nome do produto que você deseja verificar.")
+        msgPrompt = MessageFactory.text("Informe o nome do produto que você deseja consultar")
 
         opcoesPrompt = PromptOptions(
             prompt=msgPrompt,
@@ -52,5 +52,10 @@ class VerificarProdutoDialog(ComponentDialog):
         else:
             resposta = f"Não encontramos o produto '{nomeProduto}'."
 
-        await step_context.context.send_activity(MessageFactory.text(resposta))
+        # testando resposta no markdown
+        activity = MessageFactory.text(resposta)
+        activity.text_format = TextFormat.Markdown
+        activity.value_type = ActivityTypes.Message
+
+        await step_context.context.send_activity(activity)
         return await step_context.end_dialog()

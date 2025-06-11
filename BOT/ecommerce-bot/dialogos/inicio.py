@@ -23,7 +23,7 @@ from botbuilder.schema import (
 )
 from botbuilder.dialogs.choices import Choice
 from botbuilder.core import MessageFactory, UserState
-from api.rotas import ProductAPI
+from api.rotas import RotasAPI
 from dialogos.verificar_pedidos import VerificarPedidoDialog
 from dialogos.verificar_produtos import VerificarProdutoDialog
 from dialogos.lista_compra import ListaCompra
@@ -36,23 +36,19 @@ class Inicio(ComponentDialog):
 
         self.user_state = user_state
 
-        #Prompt para escolha das opções
+        # Escolha das opções
         self.add_dialog(ChoicePrompt(ChoicePrompt.__name__))
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
 
-        #Area de atendimento de Verificar Pedidos  
         self.add_dialog(VerificarPedidoDialog())
 
-        #Area de atendimento de Verificar Produtos
         self.add_dialog(VerificarProdutoDialog())
-        
-        #Area de atendimento de Lista da compra
+
         self.add_dialog(ListaCompra())
-        
+
         self.add_dialog(ComprarProdutoDialog())
 
-        # Prompt para escolha de opções
-        # Tratamento das opções de escolha do usuário
+        # Tratamento das opções
         self.add_dialog(
             WaterfallDialog(
                 "inicio",
@@ -74,44 +70,39 @@ class Inicio(ComponentDialog):
             ChoicePrompt.__name__,
             PromptOptions(
                 prompt=MessageFactory.text("Escolha a opção desejada:"),
-                choices=[Choice("Verificar Pedidos"), Choice("Verificar Produtos"), Choice("Extrato da compra"), Choice("Comprar Produto")],
+                choices=[Choice("Consultar Pedidos"), Choice("Consultar Produtos"), Choice("Extrato de compras"), Choice("Comprar Produto")],
             ),
         )
 
     async def process_option_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
-        
+
         choice = step_context.result.value
-        
-        if choice == "Verificar Pedidos":
+
+        if choice == "Consultar Pedidos":
             return await step_context.begin_dialog("VerificarPedidoDialog")
-        elif choice == "Verificar Produtos":
+        elif choice == "Consultar Produtos":
             return await step_context.begin_dialog("VerificarProdutoDialog")
         elif choice == "Extrato da compra":
             return await step_context.begin_dialog("ListaCompra")
         elif choice == "Comprar Produto":
             return await step_context.begin_dialog("ComprarProdutoDialog")
-        
-        return await step_context.next(None)
-    
-    
-    async def loop_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        """
-        Este passo é executado após um sub-diálogo terminar.
-        Ele reinicia o diálogo principal para mostrar o menu de opções novamente.
-        """
-        return await step_context.replace_dialog(self.initial_dialog_id)
-    
 
+        return await step_context.next(None)
+
+
+    async def loop_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        return await step_context.replace_dialog(self.initial_dialog_id)
+
+'''
     async def show_card_produto(self ,turn_context):
 
-        produto_api = ProductAPI()
+        rotas_api = RotasAPI()
 
-        response = produto_api.consultar_api()
+        response = rotas_api.consultar_api()
         print(response)
 
-        #Chamada de API para obter os produtos
         card = CardFactory.hero_card(
             HeroCard(
                 title=response["productName"],
@@ -129,5 +120,4 @@ class Inicio(ComponentDialog):
         )
         await turn_context.send_activity(MessageFactory.attachment(card))
 
-        
-        
+'''
