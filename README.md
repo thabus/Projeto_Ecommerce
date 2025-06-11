@@ -156,7 +156,7 @@ Contribuições são bem-vindas\! Se você tiver sugestões para melhorar o proj
 4.  Faça o Push para a sua branch (`git push origin feature/sua-feature`).
 5.  Abra um **Pull Request**.
 
-## 👤 Autor
+## 👤 Autores
 
 Desenvolvido por **Esther Pessanha**,**Thaís Bustamante**,**Douglas Silva**.
 
