@@ -1,6 +1,6 @@
 import requests
 
-class ProdutosAPI:
+class ProductAPI:
     def verificar_produtos(self, nome_produto: str):
         try:
             response = requests.get(
