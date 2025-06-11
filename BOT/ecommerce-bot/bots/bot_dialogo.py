@@ -28,6 +28,14 @@ class BotDialogo(ActivityHandler):
         await self.user_state.save_changes(turn_context)
         
     async def on_message_activity(self, turn_context: TurnContext):
+        
+        if turn_context.activity.text and turn_context.activity.text.strip().lower() == "sair":
+            await turn_context.send_activity(
+                MessageFactory.text("Até logo! Obrigado por usar nosso assistente.")
+            )
+            # O 'return' impede que a lógica do diálogo continue para este turno
+            return
+        
         await DialogHelper.run_dialog(
             self.dialog,
             turn_context,

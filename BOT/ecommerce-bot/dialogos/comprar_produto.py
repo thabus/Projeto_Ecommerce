@@ -1,4 +1,4 @@
-from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
+from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext, ListStyle
 from botbuilder.core import MessageFactory
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions, NumberPrompt, ChoicePrompt, ConfirmPrompt
 from botbuilder.dialogs.choices import Choice
@@ -8,6 +8,7 @@ from api.rotas import ProductAPI, PedidoAPI, UsuarioAPI
 class ComprarProdutoDialog(ComponentDialog):
     def __init__(self):
         super(ComprarProdutoDialog, self).__init__("ComprarProdutoDialog")
+        self.add_dialog(ChoicePrompt("continueChoicePrompt"))
 
         self.PROMPT_USER_ID = "userIdPrompt"
         self.PROMPT_CHOICE_ORDER_TYPE = "choiceOrderTypePrompt"
@@ -39,7 +40,9 @@ class ComprarProdutoDialog(ComponentDialog):
                     self.ask_card_id_or_confirm_new_order_payment_step,
                     self.ask_for_card_id_step,
                     self.process_payment_step,
-                    self.final_step
+                    self.final_step,
+                    self.ask_to_continue_step,
+                    self.process_continue_step,
                 ],
             )
         )
@@ -206,4 +209,24 @@ class ComprarProdutoDialog(ComponentDialog):
 
     async def final_step(self, step_context: WaterfallStepContext):
         await step_context.context.send_activity("Operação finalizada. Espero ter ajudado!")
-        return await step_context.end_dialog()
+        return await step_context.next(None)
+    
+    async def ask_to_continue_step(self, step_context: WaterfallStepContext):
+
+        return await step_context.prompt(
+            "continueChoicePrompt",
+            PromptOptions(
+                prompt=MessageFactory.text("Deseja comprar outro produto ou pagar um pedido pendente?"),
+                choices=[Choice("Sim"), Choice("Não")],
+                style=ListStyle.suggested_action,
+            ),
+        )
+    
+    async def process_continue_step(self, step_context: WaterfallStepContext):
+
+        if step_context.result.value == "Sim": 
+            # Reinicia o diálogo atual
+            return await step_context.replace_dialog(self.initial_dialog_id)
+        else:
+            # Encerra o diálogo atual e volta para o menu principal
+            return await step_context.end_dialog()

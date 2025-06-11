@@ -95,6 +95,5 @@ class Inicio(ComponentDialog):
 
     async def loop_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
 
-        await step_context.context.send_activity("Espero ter ajudado!")
-
+        await step_context.context.send_activity("Voltando ao menu principal...")
         return await step_context.replace_dialog(self.initial_dialog_id)

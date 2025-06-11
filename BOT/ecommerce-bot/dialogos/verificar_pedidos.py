@@ -1,6 +1,7 @@
-from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
+from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext, ListStyle
 from botbuilder.core import MessageFactory
-from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
+from botbuilder.dialogs.prompts import TextPrompt, PromptOptions, ChoicePrompt
+from botbuilder.dialogs.choices import Choice 
 
 from api.rotas import PedidoAPI
 
@@ -9,6 +10,7 @@ class VerificarPedidoDialog(ComponentDialog):
         super(VerificarPedidoDialog, self).__init__("VerificarPedidoDialog")
 
         self.add_dialog(TextPrompt("nomePrompt"))
+        self.add_dialog(ChoicePrompt("continueChoicePrompt"))
 
         self.add_dialog(
             WaterfallDialog(
@@ -16,6 +18,8 @@ class VerificarPedidoDialog(ComponentDialog):
                 [
                     self.prompt_option_step,
                     self.prompt_process_product_name_step,
+                    self.ask_to_continue_step,
+                    self.process_continue_step,
                 ],
             )
         )
@@ -57,4 +61,24 @@ class VerificarPedidoDialog(ComponentDialog):
             resposta = f"Não encontramos nenhum pedido para o produto '{nomeProduto}'."
 
         await step_context.context.send_activity(MessageFactory.text(resposta))
-        return await step_context.end_dialog()
+        return await step_context.next(None)
+    
+    async def ask_to_continue_step(self, step_context: WaterfallStepContext):
+
+        return await step_context.prompt(
+            "continueChoicePrompt",
+            PromptOptions(
+                prompt=MessageFactory.text("Deseja consultar outro produto?"),
+                choices=[Choice("Sim"), Choice("Não")],
+                style=ListStyle.suggested_action,
+            ),
+        )
+
+    async def process_continue_step(self, step_context: WaterfallStepContext):
+
+        if step_context.result.value == "Sim": 
+            # Reinicia o diálogo atual
+            return await step_context.replace_dialog(self.initial_dialog_id)
+        else:
+            # Encerra o diálogo atual e volta para o menu principal
+            return await step_context.end_dialog()
