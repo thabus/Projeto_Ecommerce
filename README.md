@@ -2,7 +2,7 @@
 
 Este repositório contém o código-fonte de uma API REST para uma plataforma de e-commerce, construída com Java, Spring Boot e uma arquitetura de dados moderna utilizando múltiplos serviços de banco de dados na nuvem da Microsoft Azure.
 
-## 🏛️ Arquitetura da Solução
+## 🏛️ Arquitetura da API
 
 O projeto implementa um banco de dados mais adequado para cada tipo de dado, otimizando performance, escalabilidade e consistência.
 
@@ -11,11 +11,42 @@ A API centraliza a lógica de negócio, orquestrando as operações entre dois s
 1.  **Azure Cosmos DB (NoSQL):** Armazena o **catálogo de produtos**. Ideal para dados com esquema flexível e que exigem alta throughput de leitura e escrita em escala global.
 2.  **Azure Database for MySQL (SQL):** Armazena todos os dados **transacionais e relacionais**, como informações de usuários, endereços, cartões de crédito, pedidos e transações financeiras, garantindo consistência (ACID) e integridade referencial.
 
-O fluxo de dados pode ser visualizado da seguinte forma:
+O fluxo de dados a partir da perspectiva da API é:
 
 ```
-Cliente (Via App/Web)  ──>  API REST (Spring Boot)  ─┬─>  Azure Cosmos DB (Para Produtos)
-                                                   └─>  Azure Database for MySQL (Para Usuários, Pedidos, etc.)
+Cliente (Ex: Chatbot, App Web)  ──>  API REST (Spring Boot)  ─┬─>  Azure Cosmos DB (Para Produtos)
+                                                              └─>  Azure Database for MySQL (Para Usuários, Pedidos, etc.)
+```
+
+## 🤖 Arquitetura do Sistema Completo (com Chatbot)
+
+Esta API serve como o backend para um **chatbot conversacional** desenvolvido em Python com o Microsoft Bot Framework. O chatbot atua como a interface do cliente, consumindo os endpoints desta API para realizar as operações.
+
+A arquitetura completa da solução pode ser visualizada abaixo:
+
+```mermaid
+graph TD
+    subgraph "Interface do Usuário"
+        U[👤 Usuário]
+    end
+
+    subgraph "Frontend: Chatbot Python"
+        B[🤖 Chatbot <br> (Bot Framework)]
+    end
+
+    subgraph "Backend: API Java (Este Projeto)"
+        A[⚙️ API REST <br> (Spring Boot)]
+    end
+
+    subgraph "Nuvem: Microsoft Azure"
+        C[Azure Cosmos DB <br> (Banco NoSQL)]
+        M[Azure Database for MySQL <br> (Banco SQL)]
+    end
+
+    U -- Conversa --> B
+    B -- Requisições HTTP --> A
+    A -- Consulta Dados --> C
+    A -- Grava Transações --> M
 ```
 
 ## ✨ Funcionalidades Principais
@@ -28,18 +59,23 @@ Cliente (Via App/Web)  ──>  API REST (Spring Boot)  ─┬─>  Azure Cosmos
 
 ## 🛠️ Tecnologias Utilizadas
 
-  * **Backend:** Java 21, Spring Boot
+### Backend (Esta API)
+
+  * **Linguagem e Framework:** Java 21, Spring Boot
   * **Acesso a Dados:** Spring Data JPA, Spring Data Cosmos
   * **Banco de Dados:** Azure Database for MySQL, Azure Cosmos DB (Core SQL API)
   * **Documentação da API:** SpringDoc (Swagger UI)
   * **Build:** Apache Maven
   * **Utilitários:** Lombok
 
+### Frontend (Chatbot)
+
+  * **Linguagem e Framework:** Python, Microsoft Bot Framework
+  * **Comunicação HTTP:** aiohttp, requests
+
 ## 📖 Endpoints da API
 
 A documentação interativa completa da API está disponível via Swagger após a execução do projeto.
-
-### Principais Endpoints:
 
 #### Gerenciamento de Produtos (`/produtos`)
 
@@ -71,16 +107,21 @@ A documentação interativa completa da API está disponível via Swagger após 
 | `POST`| `/cartoes/{id}/compra` | Realiza uma compra direta com um cartão de crédito. |
 | `GET`| `/cartoes/{id}/extrato` | Retorna o extrato de transações de um cartão. |
 
-## 🚀 Como Executar o Projeto
+## 🚀 Como Executar o Sistema
+
+Para executar o sistema completo, tanto o backend quanto o frontend (chatbot) precisam estar configurados e rodando.
 
 ### Pré-requisitos
 
   * [Git](https://git-scm.com/)
-  * [JDK 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
-  * [Apache Maven](https://maven.apache.org/download.cgi)
+  * [JDK 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html) e [Apache Maven](https://maven.apache.org/download.cgi)
+  * [Python 3.8+](https://www.python.org/downloads/) e Pip
   * Uma conta na [Microsoft Azure](https://azure.microsoft.com/)
+  * [Bot Framework Emulator](https://github.com/Microsoft/BotFramework-Emulator/releases)
 
-### 1\. Configuração na Azure
+### 1\. Backend (API REST)
+
+#### a. Configuração na Azure
 
 1.  **Crie um Recurso "Azure Database for MySQL":** Anote o servidor, nome do banco, usuário e senha.
 2.  **Crie um Recurso "Azure Cosmos DB":**
@@ -89,20 +130,15 @@ A documentação interativa completa da API está disponível via Swagger após 
       * Dentro do banco, crie um contêiner chamado `produtos`.
       * Anote a URI e a Chave Primária do seu recurso Cosmos DB.
 
-### 2\. Configuração Local
+#### b. Configuração Local
 
-1.  **Clone o repositório:**
-
+1.  **Clone o repositório da API:**
     ```bash
     git clone https://github.com/thabus/Projeto_Ecommerce.git
     cd Projeto_Ecommerce
     ```
-
 2.  **Configure as variáveis de ambiente:**
-    **NUNCA** coloque suas senhas e chaves diretamente no código. Use variáveis de ambiente.
-
-    **No Linux/macOS:**
-
+    **NUNCA** coloque suas senhas e chaves diretamente no código. Use variáveis de ambiente. No Linux/macOS:
     ```bash
     export MYSQL_URL="jdbc:mysql://SEU_SERVIDOR.mysql.database.azure.com/ecommerce"
     export MYSQL_USER="SEU_USUARIO"
@@ -110,41 +146,40 @@ A documentação interativa completa da API está disponível via Swagger após 
     export COSMOS_URI="SUA_URI_DO_COSMOS_DB"
     export COSMOS_KEY="SUA_CHAVE_DO_COSMOS_DB"
     ```
-
-    **No Windows (PowerShell):**
-
-    ```powershell
-    $env:MYSQL_URL="jdbc:mysql://SEU_SERVIDOR.mysql.database.azure.com/ecommerce"
-    $env:MYSQL_USER="SEU_USUARIO"
-    $env:MYSQL_PASS="SUA_SENHA"
-    $env:COSMOS_URI="SUA_URI_DO_COSMOS_DB"
-    $env:COSMOS_KEY="SUA_CHAVE_DO_COSMOS_DB"
-    ```
-
 3.  **Atualize o `application.properties`:**
-    Altere seu arquivo `src/main/resources/application.properties` para ler as variáveis de ambiente:
-
+    Altere o arquivo para ler as variáveis de ambiente:
     ```properties
-    # Configuracao do Banco de Dados
     spring.datasource.url=${MYSQL_URL}
     spring.datasource.username=${MYSQL_USER}
     spring.datasource.password=${MYSQL_PASS}
-    spring.jpa.hibernate.ddl-auto=update
-
-    # Configuracao do Cosmos DB
     azure.cosmos.uri=${COSMOS_URI}
     azure.cosmos.key=${COSMOS_KEY}
-    azure.cosmos.database=ecommerce
     ```
 
-### 3\. Execução
+#### c. Execução
 
-1.  **Execute a aplicação usando o Maven:**
+1.  **Execute a aplicação com o Maven:**
     ```bash
     mvn spring-boot:run
     ```
-2.  **Acesse a documentação da API:**
-    Abra seu navegador e acesse: [http://localhost:8080/swagger-ui.html](https://www.google.com/search?q=http://localhost:8080/swagger-ui.html)
+2.  **Acesse a documentação da API** no seu navegador para verificar se tudo está funcionando: [http://localhost:8080/swagger-ui.html](https://www.google.com/search?q=http://localhost:8080/swagger-ui.html)
+
+### 2\. Frontend (Chatbot)
+
+1.  **Clone o repositório do chatbot** em uma pasta separada.
+2.  **Instale as dependências:**
+    ```bash
+    # Navegue até a pasta do chatbot
+    pip install -r requirements.txt
+    ```
+3.  **Configure a URL da API:**
+      * Certifique-se de que o arquivo `api/rotas.py` do chatbot está apontando para a URL onde sua API Java está rodando (seja `http://localhost:8080` para testes locais ou a URL do seu deploy na Azure).
+4.  **Execute o chatbot:**
+    ```bash
+    python app.py
+    ```
+5.  **Teste com o Bot Framework Emulator:**
+      * Abra o emulador e conecte-se ao endpoint do seu bot, que por padrão é `http://localhost:3978/api/messages`.
 
 ## 🤝 Como Contribuir
 
@@ -158,6 +193,4 @@ Contribuições são bem-vindas\! Se você tiver sugestões para melhorar o proj
 
 ## 👤 Autores
 
-Desenvolvido por **Esther Pessanha**,**Thaís Bustamante**,**Douglas Silva**.
-
-[](https://www.google.com/search?q=https://github.com/thabus)
+Desenvolvido por **Esther Pessanha**, **Thaís Bustamante**, **Douglas Silva**.
