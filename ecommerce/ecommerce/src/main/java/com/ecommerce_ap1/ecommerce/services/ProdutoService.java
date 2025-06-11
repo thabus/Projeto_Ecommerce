@@ -71,10 +71,6 @@ public class ProdutoService {
         produtoRepository.delete(produto);
     }
 
-    public List<Produto> buscarPorNome(String nome) {
-        return produtoRepository.findByNomeContainingIgnoreCase(nome);
-    }
-
     public List<Produto> findByNomeContains(String nome) {
         return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }

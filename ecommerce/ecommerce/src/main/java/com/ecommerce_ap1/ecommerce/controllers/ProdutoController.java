@@ -45,10 +45,6 @@ public class ProdutoController {
     return ResponseEntity.ok("Produto com ID " + id + " e categoria '" + categoria + "' foi deletado com sucesso.");
 }
 
-    @GetMapping("/buscar")
-        public List<Produto> buscarPorNome(@RequestParam String nome) {
-            return produtoService.buscarPorNome(nome);
-        }
 
    @GetMapping("/search")
     public List<Produto> findByNome(@RequestParam("nome") String nome) {

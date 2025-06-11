@@ -4,7 +4,7 @@ class ProductAPI:
     def verificar_produtos(self, nome_produto: str):
         try:
             response = requests.get(
-                "http://localhost:80/produtos/search",
+                "https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/produtos/search",
                 params={"nome": nome_produto},
                 timeout=5
             )
@@ -19,7 +19,7 @@ class PedidoAPI:
     def verificar_pedidos_por_produto(self, nome_produto: str):
         try:
             response = requests.get(
-                "http://localhost:80/pedidos/search",
+                "https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/pedidos/search",
                 params={"nome": nome_produto},
                 timeout=5
             )
@@ -36,7 +36,7 @@ class PedidoAPI:
                 "produtosIds": produtos_ids
             }
             response = requests.post(
-                "http://localhost:80/pedidos/criar",
+                "https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/pedidos/criar",
                 json=payload,
                 timeout=5
             )
@@ -52,7 +52,7 @@ class PedidoAPI:
                 "cartaoId": cartao_id
             }
             response = requests.post(
-                f"http://localhost:80/pedidos/processarPagamento/{pedido_id}",
+                f"https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/pedidos/processarPagamento/{pedido_id}",
                 json=payload,
                 timeout=5
             )
@@ -68,7 +68,7 @@ class PedidoAPI:
             if status:
                 params["status"] = status
             response = requests.get(
-                "http://localhost:80/pedidos",
+                "https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/pedidos",
                 params=params,
                 timeout=5
             )
@@ -81,7 +81,7 @@ class PedidoAPI:
     def buscar_pedido_por_id(self, pedido_id: str):
         try:
             response = requests.get(
-                f"http://localhost:80/pedidos/{pedido_id}",
+                f"https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/pedidos/{pedido_id}",
                 timeout=5
             )
             response.raise_for_status()
@@ -95,7 +95,7 @@ class UsuarioAPI:
     def buscar_usuario_por_id(self, usuario_id: str):
         try:
             response = requests.get(
-                f"http://localhost:80/usuarios/{usuario_id}",
+                f"https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/usuarios/{usuario_id}",
                 timeout=5
             )
             response.raise_for_status()
@@ -113,7 +113,7 @@ class PedidoPagoAPI:
             }
 
             response = requests.get(
-                "http://localhost:80/pedidos",
+                "https://ibmec-cloud-ecommerce-edaefwhmebadf4ey.canadacentral-01.azurewebsites.net/pedidos",
                 params=params,
                 timeout=5
             )
