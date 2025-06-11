@@ -1,61 +1,163 @@
-Integrantes:
-- Esther Pessanha
-- Thaís Bustamante
-- Douglas Silva
+# Projeto E-commerce: API com Persistência Poliglota na Azure ☁️
 
-Projeto E-commerce - API de Dados na NuvemBem-vindo ao backend do Projeto E-commerce. Esta não é uma aplicação web monolítica, mas sim uma API de dados moderna construída em Java com Spring Boot, projetada para operar em um ambiente de nuvem e Big Data, utilizando uma arquitetura de persistência híbrida na Microsoft Azure.🏛️ Arquitetura do ProjetoO core deste projeto é uma API REST que orquestra dados entre dois tipos de bancos de dados na Azure, cada um escolhido por sua especialidade:Azure Database for MySQL (Banco Relacional): Armazena dados transacionais e estruturados que exigem consistência e relacionamentos claros, como:UsuariosEnderecosCartoesDeCreditoAzure Cosmos DB (Banco NoSQL - Multimodelo): Armazena o catálogo de Produtos. Foi escolhido por sua alta escalabilidade, flexibilidade de schema e performance para grandes volumes de dados (cenário de Big Data). A entidade Produto utiliza categoria como Chave de Partição, otimizando a distribuição e a consulta de dados em larga escala.Diagrama de Fluxo de Dadosgraph TD
-    subgraph Cliente
-        A[Usuário via Postman/Frontend]
-    end
+Este repositório contém o código-fonte de uma API REST para uma plataforma de e-commerce, construída com Java, Spring Boot e uma arquitetura de dados moderna utilizando múltiplos serviços de banco de dados na nuvem da Microsoft Azure.
 
-    subgraph "API Backend (Spring Boot)"
-        B(API Gateway / Controllers)
-        C{Lógica de Negócio / Services}
-    end
+## 🏛️ Arquitetura da Solução
 
-    subgraph "Camada de Dados (Azure Cloud)"
-        D[Azure DB for MySQL]
-        E[Azure Cosmos DB]
-    end
+O projeto implementa um padrão de **Persistência Poliglota**, selecionando a tecnologia de banco de dados mais adequada para cada tipo de dado, otimizando performance, escalabilidade e consistência.
 
-    A -- Requisição HTTP --> B
-    B -- Chama --> C
-    C -- Dados Relacionais (Usuário, Cartão) --> D
-    C -- Dados do Catálogo (Produto) --> E
-    D -- Responde --> C
-    E -- Responde --> C
-    C -- Retorna DTO --> B
-    B -- Resposta HTTP --> A
-✨ Funcionalidades da APIA API expõe um conjunto de endpoints RESTful para gerenciar as principais entidades do sistema de e-commerce:Gerenciamento de Usuários: CRUD completo para usuários e seus endereços.Gerenciamento de Pagamentos: CRUD para cartões de crédito, simulação de compras e extrato de transações.Catálogo de Produtos: CRUD completo para produtos, com buscas otimizadas no Cosmos DB.Sistema de Pedidos: Lógica para criar pedidos, processar pagamentos e consultar o histórico, combinando dados dos dois bancos de dados.🛠️ Tecnologias UtilizadasBackend:Java 21Spring Boot 3Spring Data JPASpring WebMavenLombokCloud & Banco de Dados:Azure Database for MySQLAzure Cosmos DB (via spring-cloud-azure-starter-data-cosmos)Documentação da API:SpringDoc OpenAPI (Swagger)🚀 Configuração e ExecuçãoSiga os passos abaixo para configurar e executar o projeto localmente.Pré-requisitosGitJDK 21MavenUma conta na Microsoft Azure com os serviços de MySQL e Cosmos DB provisionados.Passo a PassoClone o repositório:git clone https://github.com/thabus/Projeto_Ecommerce.git
-cd Projeto_Ecommerce
-Configure as Variáveis de Ambiente:NUNCA coloque suas chaves e senhas diretamente no arquivo application.properties. A forma correta é usar variáveis de ambiente.Crie um arquivo .env na raiz do projeto (este arquivo não deve ser enviado ao Git) ou configure as variáveis diretamente no seu sistema operacional.Exemplo de .env:# Configuracao do Banco de Dados MySQL na Azure
-DB_URL=jdbc:mysql://SEU_HOST_MYSQL.mysql.database.azure.com/ecommerce
-DB_USER=SEU_USUARIO
-DB_PASS=SUA_SENHA_MYSQL
+A API centraliza a lógica de negócio, orquestrando as operações entre dois serviços de banco de dados na Azure:
 
-# Configuracao do Cosmos DB na Azure
-COSMOS_URI=https://SEU_COSMOS_ACCOUNT.documents.azure.com:443/
-COSMOS_KEY=SUA_CHAVE_PRIMARIA_COSMOS
-COSMOS_DB_NAME=ecommerce
-Ajuste o application.properties:Altere seu arquivo src/main/resources/application.properties para ler essas variáveis de ambiente.# Configuracao do Banco de Dados
-spring.datasource.url=${DB_URL}
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASS}
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+1.  **Azure Cosmos DB (NoSQL):** Armazena o **catálogo de produtos**. Ideal para dados com esquema flexível e que exigem alta throughput de leitura e escrita em escala global.
+2.  **Azure Database for MySQL (SQL):** Armazena todos os dados **transacionais e relacionais**, como informações de usuários, endereços, cartões de crédito, pedidos e transações financeiras, garantindo consistência (ACID) e integridade referencial.
 
-# Configuracao do Cosmos DB
-azure.cosmos.uri=${COSMOS_URI}
-azure.cosmos.key=${COSMOS_KEY}
-azure.cosmos.database=${COSMOS_DB_NAME}
-azure.cosmos.queryMetricsEnabled=true
-azure.cosmos.responseDiagnosticsEnabled=true
+O fluxo de dados pode ser visualizado da seguinte forma:
 
-# Outras configs
-server.port=8080
-spring.application.name=ecommerce
-springdoc.api-docs.enabled=true
-springdoc.swagger-ui.enabled=true
-Execute a aplicação:mvn spring-boot:run
-📖 Documentação da API (Swagger)Com a aplicação em execução, você pode explorar e interagir com todos os endpoints através da interface do Swagger UI.Acesse o seguinte endereço no seu navegador:http://localhost:8080/swagger-ui.html🤝 Como ContribuirContribuições são bem-vindas! Se você tem ideias para melhorias ou encontrou algum problema, sinta-se à vontade para:Fazer um Fork do projeto.Criar uma nova branch (git checkout -b feature/minha-feature).Fazer o commit das suas alterações (git commit -m 'Adiciona minha feature').Fazer o Push para a sua branch (git push origin feature/minha-feature).Abrir um Pull Request.👤 AutorFeito por thabus.
+```
+Cliente (Via App/Web)  ──>  API REST (Spring Boot)  ─┬─>  Azure Cosmos DB (Para Produtos)
+                                                   └─>  Azure Database for MySQL (Para Usuários, Pedidos, etc.)
+```
+
+## ✨ Funcionalidades Principais
+
+  * **Gerenciamento de Usuários:** CRUD completo de usuários e seus dados associados.
+  * **Catálogo de Produtos:** CRUD de produtos com busca otimizada no Cosmos DB.
+  * **Endereços e Cartões:** Gerenciamento de múltiplos endereços e cartões de crédito por usuário.
+  * **Ciclo de Pedidos:** Criação de pedidos, processamento de pagamentos e consulta de status.
+  * **Consultas:** Busca de pedidos por produto, extrato de transações do cartão e listagem de pedidos com filtros.
+
+## 🛠️ Tecnologias Utilizadas
+
+  * **Backend:** Java 21, Spring Boot
+  * **Acesso a Dados:** Spring Data JPA, Spring Data Cosmos
+  * **Banco de Dados:** Azure Database for MySQL, Azure Cosmos DB (Core SQL API)
+  * **Documentação da API:** SpringDoc (Swagger UI)
+  * **Build:** Apache Maven
+  * **Utilitários:** Lombok
+
+## 📖 Endpoints da API
+
+A documentação interativa completa da API está disponível via Swagger após a execução do projeto.
+
+### Principais Endpoints:
+
+#### Gerenciamento de Produtos (`/produtos`)
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `POST` | `/` | Cria um novo produto no Cosmos DB. |
+| `GET` | `/` | Lista todos os produtos cadastrados. |
+| `GET` | `/search` | Busca produtos por parte do nome (`?nome=...`). |
+| `PUT` | `/{id}` | Atualiza os dados de um produto. |
+| `DELETE`| `/{id}/{categoria}` | Remove um produto (requer ID e chave de partição). |
+
+#### Gerenciamento de Usuários e Endereços (`/usuarios`, `/enderecos`)
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `POST` | `/usuarios` | Cria um novo usuário e seus cartões iniciais. |
+| `GET` | `/usuarios` | Lista todos os usuários. |
+| `GET` | `/usuarios/{id}` | Busca um usuário por ID. |
+| `POST` | `/enderecos` | Cadastra um novo endereço para um usuário. |
+| `GET`| `/enderecos/usuario/{usuarioId}` | Lista todos os endereços de um usuário. |
+
+#### Ciclo de Compras e Pedidos (`/pedidos`, `/cartoes`)
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `POST` | `/pedidos/criar` | Cria um novo pedido com os itens do carrinho. |
+| `POST` | `/pedidos/processarPagamento/{pedidoId}` | Processa o pagamento de um pedido existente. |
+| `GET` | `/pedidos` | Lista todos os pedidos, com filtros opcionais. |
+| `POST`| `/cartoes/{id}/compra` | Realiza uma compra direta com um cartão de crédito. |
+| `GET`| `/cartoes/{id}/extrato` | Retorna o extrato de transações de um cartão. |
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+
+  * [Git](https://git-scm.com/)
+  * [JDK 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+  * [Apache Maven](https://maven.apache.org/download.cgi)
+  * Uma conta na [Microsoft Azure](https://azure.microsoft.com/)
+
+### 1\. Configuração na Azure
+
+1.  **Crie um Recurso "Azure Database for MySQL":** Anote o servidor, nome do banco, usuário e senha.
+2.  **Crie um Recurso "Azure Cosmos DB":**
+      * Escolha a API **Core (SQL)**.
+      * Crie um banco de dados chamado `ecommerce`.
+      * Dentro do banco, crie um contêiner chamado `produtos`.
+      * Anote a URI e a Chave Primária do seu recurso Cosmos DB.
+
+### 2\. Configuração Local
+
+1.  **Clone o repositório:**
+
+    ```bash
+    git clone https://github.com/thabus/Projeto_Ecommerce.git
+    cd Projeto_Ecommerce
+    ```
+
+2.  **Configure as variáveis de ambiente:**
+    **NUNCA** coloque suas senhas e chaves diretamente no código. Use variáveis de ambiente.
+
+    **No Linux/macOS:**
+
+    ```bash
+    export MYSQL_URL="jdbc:mysql://SEU_SERVIDOR.mysql.database.azure.com/ecommerce"
+    export MYSQL_USER="SEU_USUARIO"
+    export MYSQL_PASS="SUA_SENHA"
+    export COSMOS_URI="SUA_URI_DO_COSMOS_DB"
+    export COSMOS_KEY="SUA_CHAVE_DO_COSMOS_DB"
+    ```
+
+    **No Windows (PowerShell):**
+
+    ```powershell
+    $env:MYSQL_URL="jdbc:mysql://SEU_SERVIDOR.mysql.database.azure.com/ecommerce"
+    $env:MYSQL_USER="SEU_USUARIO"
+    $env:MYSQL_PASS="SUA_SENHA"
+    $env:COSMOS_URI="SUA_URI_DO_COSMOS_DB"
+    $env:COSMOS_KEY="SUA_CHAVE_DO_COSMOS_DB"
+    ```
+
+3.  **Atualize o `application.properties`:**
+    Altere seu arquivo `src/main/resources/application.properties` para ler as variáveis de ambiente:
+
+    ```properties
+    # Configuracao do Banco de Dados
+    spring.datasource.url=${MYSQL_URL}
+    spring.datasource.username=${MYSQL_USER}
+    spring.datasource.password=${MYSQL_PASS}
+    spring.jpa.hibernate.ddl-auto=update
+
+    # Configuracao do Cosmos DB
+    azure.cosmos.uri=${COSMOS_URI}
+    azure.cosmos.key=${COSMOS_KEY}
+    azure.cosmos.database=ecommerce
+    ```
+
+### 3\. Execução
+
+1.  **Execute a aplicação usando o Maven:**
+    ```bash
+    mvn spring-boot:run
+    ```
+2.  **Acesse a documentação da API:**
+    Abra seu navegador e acesse: [http://localhost:8080/swagger-ui.html](https://www.google.com/search?q=http://localhost:8080/swagger-ui.html)
+
+## 🤝 Como Contribuir
+
+Contribuições são bem-vindas\! Se você tiver sugestões para melhorar o projeto, por favor, siga estas etapas:
+
+1.  Faça um **Fork** do projeto.
+2.  Crie uma nova branch (`git checkout -b feature/sua-feature`).
+3.  Faça o commit das suas alterações (`git commit -m 'Adiciona nova feature'`).
+4.  Faça o Push para a sua branch (`git push origin feature/sua-feature`).
+5.  Abra um **Pull Request**.
+
+## 👤 Autor
+
+Desenvolvido por **Esther Pessanha**,**Thaís Bustamante**,**Douglas Silva**.
+
+[](https://www.google.com/search?q=https://github.com/thabus)
