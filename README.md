@@ -1,4 +1,4 @@
-# Projeto E-commerce - API de Dados na Nuvem ☁️
+# API E-commerce com Persistência Híbrida (SQL + NoSQL)
 
 Este repositório contém o código-fonte de uma API REST para uma plataforma de e-commerce, construída com Java, Spring Boot e uma arquitetura de dados moderna utilizando múltiplos serviços de banco de dados na nuvem da Microsoft Azure.
 
