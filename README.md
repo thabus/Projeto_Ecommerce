@@ -27,26 +27,27 @@ A arquitetura completa da solução pode ser visualizada abaixo:
 ```mermaid
 graph TD
     subgraph "Interface do Usuário"
-        U[👤 Usuário]
+        U["👤 Usuário"]
     end
 
     subgraph "Frontend: Chatbot Python"
-        B[🤖 Chatbot <br> (Bot Framework)]
+        B["🤖 Chatbot <br/> (Bot Framework)"]
     end
 
     subgraph "Backend: API Java (Este Projeto)"
-        A[⚙️ API REST <br> (Spring Boot)]
+        A["⚙️ API REST <br/> (Spring Boot)"]
     end
 
     subgraph "Nuvem: Microsoft Azure"
-        C[Azure Cosmos DB <br> (Banco NoSQL)]
-        M[Azure Database for MySQL <br> (Banco SQL)]
+        C["Azure Cosmos DB <br/> (Banco NoSQL)"]
+        M["Azure Database for MySQL <br/> (Banco SQL)"]
     end
 
     U -- Conversa --> B
     B -- Requisições HTTP --> A
     A -- Consulta Dados --> C
     A -- Grava Transações --> M
+
 ```
 
 ## ✨ Funcionalidades Principais
